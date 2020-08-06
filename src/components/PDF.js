@@ -3,9 +3,10 @@ import styled from 'styled-components';
 
 
 const PDFComponent = (props) => {
+  let base64String = btoa(String.fromCharCode(...props.data));
   return (
     <Container>
-      <PDF src={props.source} />
+      <PDF src={`data:application/pdf;base64,${base64String}`} />
     </Container>
   )
 }

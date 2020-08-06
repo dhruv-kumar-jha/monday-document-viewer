@@ -42,7 +42,8 @@ class Application extends Component {
   async processFile() {
     const unsupportedFormats = [ 'tiff' ];
     const images = [ 'jpg', 'png', 'gif', 'ico', 'svg', 'webp' ];
-    const url = this.state.file;
+    // const url = this.state.file;
+    const url = `https://cors-anywhere.herokuapp.com/${this.state.file}`;
     const extension = this.getExtension(url);
 
     // check if the file type can be rendered in browser or not
@@ -57,10 +58,19 @@ class Application extends Component {
       return;
     }
 
+    // if ( extension === 'pdf' ) {
+    //   this.setState({ fileType: 'pdf', extension: extension, loading: false });
+    //   return;
+    // }
+
     if ( extension === 'pdf' ) {
-      this.setState({ fileType: 'pdf', extension: extension, loading: false });
+      const res = await fetch(url);
+      const ab = await res.arrayBuffer();
+      const data = new Uint8Array(ab);
+      this.setState({ fileType: 'pdf', data: data, extension: extension, loading: false });
       return;
     }
+
 
     if ( extension === 'csv' ) {
       try {
@@ -87,7 +97,7 @@ class Application extends Component {
       try {
         const res = await fetch(url);
         const ab = await res.arrayBuffer();
-        const data = new Uint8Array(ab)
+        const data = new Uint8Array(ab);
         this.setState({ fileType: 'excel', data: data, extension: extension, loading: false });
       } catch (error) {
         this.setState({ notfound: true, extension: extension, loading: false });
@@ -159,7 +169,7 @@ class Application extends Component {
           <Image source={this.state.file} />
         }
         { fileType && fileType === 'pdf' &&
-          <PDF source={this.state.file} />
+          <PDF data={this.state.data} source={this.state.file} />
         }
         { fileType && fileType === 'csv' &&
           <CSV data={this.state.data} />
