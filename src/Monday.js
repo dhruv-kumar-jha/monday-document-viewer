@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import App from './App';
 import styled from 'styled-components';
 import mondaySdk from "monday-sdk-js";
 
 import Loading from './components/Loading';
 import BoardsContainer from './components/BoardsContainer';
+import Preview from './pages/Preview';
 
 
 const monday = mondaySdk();
@@ -19,36 +19,40 @@ class Monday extends Component {
       loading: true,
       settings: null,
       boards: null,
+      selected: null,
     }
-
+    this.previewFile = this.previewFile.bind(this);
+    this.exitPreview = this.exitPreview.bind(this);
   }
+
 
   componentDidMount() {
     monday.listen("settings", res => {
       this.setState({ settings: res.data });
-      if ( ! res.data.document || ! res.data.title ) {
+      if ( ! res.data.document ) {
         this.setState({ loading: false });
       } else {
         monday.listen("context", res => {
           this.setState({ context: res.data });
           monday.api(
             `
-query ($boardIds: [Int]) {
-  boards( ids: $boardIds ) {
-    name
-    id
-    items {
-      name
-      id
-      created_at
-      column_values {
-        id
-        text
-        title
-      }
-    }
-  }
-}            `,
+              query ($boardIds: [Int]) {
+                boards( ids: $boardIds ) {
+                  name
+                  id
+                  items {
+                    name
+                    id
+                    created_at
+                    column_values {
+                      id
+                      text
+                      title
+                    }
+                  }
+                }
+              }
+            `,
             {
               variables: { boardIds: res.data.boardIds }
             }
@@ -64,7 +68,13 @@ query ($boardIds: [Int]) {
 
 
 
+  previewFile(data) {
+    this.setState({ selected: data });
+  }
 
+  exitPreview() {
+    this.setState({ selected: null });
+  }
 
 
 
@@ -77,7 +87,7 @@ query ($boardIds: [Int]) {
       return <Loading text="Loading, Please wait..." />
     }
 
-    if ( ! this.state.settings.document || ! this.state.settings.title ) {
+    if ( ! this.state.settings.document ) {
       return (
         <Container>
           <Inner>
@@ -88,8 +98,12 @@ query ($boardIds: [Int]) {
       )
     }
 
+    if ( this.state.selected ) {
+      return <Preview data={ this.state.selected } exitPreview={ this.exitPreview } />
+    }
+
     return (
-      <BoardsContainer boards={this.state.boards} />
+      <BoardsContainer boards={this.state.boards} settings={ this.state.settings } onClick={ this.previewFile } />
     )
 
   }

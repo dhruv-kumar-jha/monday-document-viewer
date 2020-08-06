@@ -26,7 +26,7 @@ class Application extends Component {
       unsupported: null,
       notfound: null,
 
-      file: 'https://file-examples-com.github.io/uploads/2017/10/file_example_JPG_100kB.jpg',
+      file: this.props.url,
       fileType: null,
       extension: null,
     }
@@ -170,9 +170,6 @@ class Application extends Component {
         { fileType && fileType === 'word' &&
           <Word source={this.state.file} />
         }
-
-
-
       </Container>
     )
 
@@ -185,23 +182,17 @@ export default Application;
 
 
 
-
-
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   min-height: 100px;
   height: 100%;
   overflow: auto;
-  background: #ccc;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 `;
 
 /*
-  justify-content: center;
-  align-items: center;
-
-
-  border: 1px solid #ccc;
-  padding: 20px;
-
+  background: #ccc;
 */
+

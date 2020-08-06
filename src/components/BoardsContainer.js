@@ -2,6 +2,25 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 
 
+const findFiles = (data, settings) => {
+  const fileFieldName = Object.keys(settings.document)[0] || null;
+  const files = data.find( item => {
+    return item.id === fileFieldName
+  });
+
+  const parsedFiles = files.text.split(',');
+
+  const res = parsedFiles.map( file => {
+    return {
+      file: file.trim(),
+      name: file.trim().split('/').pop(),
+    }
+  });
+
+  return res;
+}
+
+
 const BoardsContainer = (props) => {
   console.log("BoardsContainer::props",props);
   const { boards } = props;
@@ -16,9 +35,21 @@ const BoardsContainer = (props) => {
 
             <div style={{ marginTop: 20 }}>
               { board.items && board.items.length > 0 && board.items.map( item => {
+                const files = findFiles(item.column_values, props.settings)
                 return (
                   <BoardItem key={ item.id }>
-                    { item.name }
+                    <div>{ item.name }</div>
+
+                    { files && files[0] && files[0].file != '' &&
+                    <FilesContainer>
+                      { files.map( (file, index) => {
+                        return (
+                          <File onClick={ () => { props.onClick({ ...file, title: item.name }) } } key={index}>{ file.name }</File>
+                        )
+                      }) }
+                    </FilesContainer>
+                    }
+
                   </BoardItem>
                 )
               }) }
@@ -59,10 +90,9 @@ const BoardTitle = styled.p`
 
 const BoardItem = styled.div`
   border: 1px solid #ccc;
-  padding: 10px 20px;
+  padding: 20px;
   border-radius: 5px;
   margin-bottom: 10px;
-  cursor: pointer;
   font-size: 16px;
 
   &:hover {
@@ -70,22 +100,31 @@ const BoardItem = styled.div`
   }
 `;
 
-const Button = styled.button`
-  background: #000;
-  font-size: 14px;
-  padding: 10px;
-  border: none;
+
+
+
+const FilesContainer = styled.div`
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+`;
+
+const File = styled.div`
+  background: #333;
   color: #fff;
+  font-size: 12px;
+  line-height: 100%;
+  border-radius: 10px;
+  margin-right: 5px;
+  font-weight: normal;
+  padding: 5px 10px;
   cursor: pointer;
-  margin-left: 10px;
-  border-radius: 4px;
+
 
   &:hover {
     background: #ff0000;
   }
-
 `;
-
-
 
 

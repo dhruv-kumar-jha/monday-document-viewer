@@ -21,7 +21,9 @@ const Container = styled.div`
   justify-content: center;
   background: #ffdbd0;
   height: 100%;
-  box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75);
+  box-shadow: 0px 4px 4px 0px rgba(0,0,0,0.2);
+  padding: 20px;
+  border-radius: 4px;
 `;
 
 
@@ -36,5 +38,6 @@ const Text = styled.p`
   line-height: 100%;
   margin-top: 10px;
   max-width: 80%;
+  word-break: break-all;
 `;
 

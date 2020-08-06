@@ -51,13 +51,13 @@ const ImageContainer = styled.div`
 
 const Image = styled.img`
   width: 100%;
-  border-radius: 5px;
+  border-radius: 4px;
 `;
 
 const Details = styled.p`
   font-size: 16px;
   color: #666;
-  margin-top: 10px;
+  margin-top: 15px;
   text-align: left;
 `;
 
