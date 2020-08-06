@@ -35,5 +35,6 @@ const Text = styled.p`
   font-size: 20px;
   line-height: 100%;
   margin-top: 10px;
+  max-width: 80%;
 `;
 
