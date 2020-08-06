@@ -42,8 +42,12 @@ https://file-examples.com/index.php/sample-documents-download/
 
 - https://file-examples-com.github.io/uploads/2017/02/file_example_XLS_10.xls
 - https://file-examples-com.github.io/uploads/2017/02/file_example_XLS_50.xls
+- https://file-examples-com.github.io/uploads/2017/02/file_example_XLS_1000.xls
+- https://file-examples-com.github.io/uploads/2017/02/file_example_XLSX_100.xlsx
+
 - https://file-examples-com.github.io/uploads/2017/02/file-sample_100kB.doc
 - https://file-examples-com.github.io/uploads/2017/02/file-sample_500kB.doc
+- https://file-examples-com.github.io/uploads/2017/02/file-sample_500kB.docx
 
 - `CORS Fix: https://cors-anywhere.herokuapp.com/`
 
@@ -53,6 +57,7 @@ yarn global add serve
 serve -s build
 `
 
+<iframe src="https://docs.google.com/gview?url=http://remote.url.tld/path/to/document.doc&embedded=true"></iframe>
 
 
 

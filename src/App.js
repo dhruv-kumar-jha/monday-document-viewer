@@ -9,6 +9,7 @@ import PDF from './components/PDF';
 import CSV from './components/CSV';
 import JSONData from './components/JSON';
 import Excel from './components/Excel';
+import Word from './components/Word';
 
 
 import Unsupported from './components/Unsupported';
@@ -25,7 +26,7 @@ class Application extends Component {
       unsupported: null,
       notfound: null,
 
-      file: 'https://file-examples-com.github.io/uploads/2017/10/file_example_PNG_500kB.png',
+      file: 'https://file-examples-com.github.io/uploads/2017/10/file_example_JPG_100kB.jpg',
       fileType: null,
       extension: null,
     }
@@ -82,17 +83,23 @@ class Application extends Component {
       return;
     }
 
-    if ( extension === 'xls' ) {
+    if ( extension === 'xls' || extension === 'xlsx' ) {
       try {
         const res = await fetch(url);
-        const data = res.arrayBuffer();
-        console.log("data",data);
+        const ab = await res.arrayBuffer();
+        const data = new Uint8Array(ab)
         this.setState({ fileType: 'excel', data: data, extension: extension, loading: false });
       } catch (error) {
         this.setState({ notfound: true, extension: extension, loading: false });
       }
       return;
     }
+
+    if ( extension === 'doc' || extension === 'docx' ) {
+      this.setState({ fileType: 'word', extension: extension, loading: false });
+      return;
+    }
+
 
 
 
@@ -160,6 +167,10 @@ class Application extends Component {
         { fileType && fileType === 'excel' &&
           <Excel data={this.state.data} />
         }
+        { fileType && fileType === 'word' &&
+          <Word source={this.state.file} />
+        }
+
 
 
       </Container>

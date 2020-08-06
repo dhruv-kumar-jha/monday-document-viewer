@@ -1,26 +1,22 @@
 import React from 'react';
 import XLSX from 'xlsx';
 import styled from 'styled-components';
+import ExcelTable from './ExcelTable';
 
 
 const ExcelComponent = (props) => {
-  console.log("ExcelComponent");
-  const workbook = XLSX.read(new Uint8Array(props.data), {
+
+  const workbook = XLSX.read( props.data, {
     type: 'array',
   });
-  console.log("workbook",workbook);
-
-  const first_worksheet = workbook.Sheets[workbook.SheetNames[0]];
-  console.log("first_worksheet",first_worksheet);
-
-  const data = XLSX.utils.aoa_to_sheet(first_worksheet, {header:1});
-  console.log("data",data);
-
-// sheet_to_json
+  const first_sheet_name = workbook.SheetNames[0];
+  const worksheet = workbook.Sheets[first_sheet_name];
+  const jsonData = XLSX.utils.sheet_to_json(worksheet, { raw: true });
 
   return (
     <Container>
-      <Text>Hello World!</Text>
+      { jsonData && jsonData.length > 0 && <ExcelTable data={jsonData} /> }
+      { jsonData && jsonData.length <= 0 && <Text>This CSV file doesn't contain any data.</Text> }
     </Container>
   )
 
