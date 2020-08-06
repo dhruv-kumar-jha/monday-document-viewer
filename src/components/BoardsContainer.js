@@ -2,22 +2,24 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 
 
-const findFiles = (data, settings) => {
-  const fileFieldName = Object.keys(settings.document)[0] || null;
-  const files = data.find( item => {
-    return item.id === fileFieldName
+const findFiles = (data) => {
+  const files = data.filter( item => {
+    return item.type === 'file'
   });
-
-  const parsedFiles = files.text.split(',');
-
-  const res = parsedFiles.map( file => {
-    return {
-      file: file.trim(),
-      name: file.trim().split('/').pop(),
+  const response = [];
+  files.map( file => {
+    const res = JSON.parse(file.value);
+    if ( res && res.files && res.files.length > 0 ) {
+      res.files.map( resFile => {
+        response.push({
+          assetId: resFile.assetId,
+          name: resFile.name
+        });
+      });
     }
   });
 
-  return res;
+  return response;
 }
 
 
@@ -35,7 +37,7 @@ const BoardsContainer = (props) => {
 
             <div style={{ marginTop: 20 }}>
               { board.items && board.items.length > 0 && board.items.map( item => {
-                const files = findFiles(item.column_values, props.settings)
+                const files = findFiles(item.column_values)
                 return (
                   <BoardItem key={ item.id }>
                     <div>{ item.name }</div>

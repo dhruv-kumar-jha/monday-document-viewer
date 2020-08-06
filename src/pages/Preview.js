@@ -6,19 +6,19 @@ import App from '../App';
 
 const Preview = (props) => {
 
-  console.log("Preview::props",props);
-  const { data } = props;
+  const { data, exitPreview, assets } = props;
+  const asset = assets.find( item => item.id == data.assetId );
 
   return (
     <Container>
 
       <Board>
         <BoardTitle>{ data.title }</BoardTitle>
-        <ExitPreview onClick={ props.exitPreview }>Exit Preview</ExitPreview>
+        <ExitPreview onClick={ exitPreview }>Exit Preview</ExitPreview>
       </Board>
 
       <DocumentPreview>
-        <App url={ data.file } />
+        <App url={ asset.public_url } extension={ asset.file_extension } />
       </DocumentPreview>
 
     </Container>

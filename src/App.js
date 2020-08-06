@@ -110,6 +110,9 @@ class Application extends Component {
 
 
   getExtension(file) {
+    if ( this.props.extension ) {
+      return this.props.extension.substring(1);;
+    }
     return file.split('.').pop();
   }
 

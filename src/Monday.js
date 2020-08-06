@@ -11,14 +11,35 @@ const monday = mondaySdk();
 
 
 
+const getAssetsIds = (boards) => {
+  const assets = [];
+  boards.map( board => {
+    board.items.map( item => {
+      item.column_values.filter( data => {
+        if ( data.type == "file" ) {
+          const parsed = JSON.parse(data.value);
+          if ( parsed && parsed.files && parsed.files.length > 0 ) {
+            parsed.files && parsed.files.map( asset => {
+              assets.push(asset.assetId);
+            });
+          }
+        }
+      });
+    })
+  });
+  return assets;
+}
+
+
+
 class Monday extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
       loading: true,
-      settings: null,
       boards: null,
+      assets: null,
       selected: null,
     }
     this.previewFile = this.previewFile.bind(this);
@@ -27,43 +48,57 @@ class Monday extends Component {
 
 
   componentDidMount() {
-    monday.listen("settings", res => {
-      this.setState({ settings: res.data });
-      if ( ! res.data.document ) {
-        this.setState({ loading: false });
-      } else {
-        monday.listen("context", res => {
-          this.setState({ context: res.data });
-          monday.api(
-            `
-              query ($boardIds: [Int]) {
-                boards( ids: $boardIds ) {
-                  name
+    monday.listen("context", res => {
+      this.setState({ context: res.data });
+      console.log("res.data.boardIds", res.data.boardIds);
+      monday.api(
+        `
+          query ($boardIds: [Int]) {
+            boards( ids: $boardIds ) {
+              name
+              id
+              items {
+                name
+                id
+                created_at
+                column_values {
                   id
-                  items {
-                    name
-                    id
-                    created_at
-                    column_values {
-                      id
-                      text
-                      title
-                    }
-                  }
+                  type
+                  value
+                  text
+                  title
                 }
               }
-            `,
-            {
-              variables: { boardIds: res.data.boardIds }
             }
-          ).then(res => {
-            this.setState({ boards: res.data.boards, loading: false });
-          });
+          }
+        `,
+        {
+          variables: { boardIds: res.data.boardIds }
+        }
+      ).then(res => {
+        this.setState({ boards: res.data.boards });
+        const assetIds = getAssetsIds(res.data.boards);
+        monday.api(
+          `
+            query ( $assetIds: [Int]! ) {
+              assets( ids: $assetIds ) {
+                id
+                name
+                url
+                public_url
+                url_thumbnail
+                file_extension
+              }
+            }
+          `,
+          {
+            variables: { assetIds: assetIds }
+          }
+        ).then( res => {
+          this.setState({ assets: res.data.assets, loading: false });
         });
-      }
+      });
     });
-
-
   }
 
 
@@ -83,27 +118,27 @@ class Monday extends Component {
 
     console.log("this.state", this.state);
 
-    if ( this.state.loading || this.state.settings === null ) {
+    if ( this.state.loading ) {
       return <Loading text="Loading, Please wait..." />
     }
 
-    if ( ! this.state.settings.document ) {
-      return (
-        <Container>
-          <Inner>
-            <Text>Before you can start seeing the document preview, Please select the appropriate columns first by clicking on the <u>settings</u> panel.</Text>
-            <Text style={{ marginTop: 20 }}>Please select the column fields first.</Text>
-          </Inner>
-        </Container>
-      )
-    }
+    // if ( ! this.state.settings.document ) {
+    //   return (
+    //     <Container>
+    //       <Inner>
+    //         <Text>Before you can start seeing the document preview, Please select the appropriate columns first by clicking on the <u>settings</u> panel.</Text>
+    //         <Text style={{ marginTop: 20 }}>Please select the column fields first.</Text>
+    //       </Inner>
+    //     </Container>
+    //   )
+    // }
 
     if ( this.state.selected ) {
-      return <Preview data={ this.state.selected } exitPreview={ this.exitPreview } />
+      return <Preview data={ this.state.selected } exitPreview={ this.exitPreview } assets={ this.state.assets } />
     }
 
     return (
-      <BoardsContainer boards={this.state.boards} settings={ this.state.settings } onClick={ this.previewFile } />
+      <BoardsContainer boards={this.state.boards} onClick={ this.previewFile } />
     )
 
   }
@@ -144,30 +179,46 @@ const Text = styled.p`
 
 
 /*
-    monday.listen("context", res => {
-      this.setState({ context: res.data });
-      monday.api(`query ($boardIds: [Int]) { boards (ids:$boardIds) { name items(limit:1) { name column_values { title text } } } }`,
-        { variables: { boardIds: this.state.context.boardIds } }
-      ).then(res => {
-        this.setState({ boardData: res.data, loadingBoard: false });
 
-        // let's get the file url and title
-        const urlFieldName = Object.keys(this.state.settings.document)[0] || null;
-        const titleFieldName = Object.keys(this.state.settings.title)[0] || null;
-
-        const board = res.data.boards[0];
-        if ( board ) {
-          console.log("board",board);
-          const items = board.items[0].column_values;
-          console.log("items",items);
-          // const file = board.items.find( item => {
-          //   console.log("item",item);
-          // });
-        }
-
-        this.setState({ urlFieldName: urlFieldName, titleFieldName: titleFieldName });
-      });
+  componentDidMount() {
+    monday.listen("settings", res => {
+      this.setState({ settings: res.data });
+      if ( ! res.data.document ) {
+        this.setState({ loading: false });
+      } else {
+        monday.listen("context", res => {
+          this.setState({ context: res.data });
+          monday.api(
+            `
+              query ($boardIds: [Int]) {
+                boards( ids: $boardIds ) {
+                  name
+                  id
+                  items {
+                    name
+                    id
+                    created_at
+                    column_values {
+                      id
+                      type
+                      value
+                      text
+                      title
+                    }
+                  }
+                }
+              }
+            `,
+            {
+              variables: { boardIds: res.data.boardIds }
+            }
+          ).then(res => {
+            this.setState({ boards: res.data.boards, loading: false });
+          });
+        });
+      }
     });
+  }
 
 
 */
