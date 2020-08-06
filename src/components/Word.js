@@ -32,7 +32,6 @@ class WordComponent extends Component {
     }
 
     const url = `https://view.officeapps.live.com/op/embed.aspx?src=${this.props.source}`;
-    console.log("url",url);
 
     return (
       <Container>
