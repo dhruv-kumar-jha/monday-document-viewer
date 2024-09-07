@@ -2,7 +2,7 @@
 
 This application allows users to view their documents within Monday.com
 
-**I don't recommend this for production use!**
+**I don't recommend using this for production!**
 
 ---
 
@@ -21,7 +21,7 @@ and more.
 
 ## How to Use?
 
-1. Clonse this repo
+1. Clone this repo
 2. Run yarn/npm install to install all the dependencies
 3. Run the command yarn build to generate a production build
 4. Zip the entire contents of build directory and upload it on monday.com
